@@ -1,7 +1,7 @@
 public enum Formato {
 	
-	TAPA_DURA("tapa dura"),
-	RUSTICO("rústico");
+	TAPA_DURA("Tapa Dura"),
+	RUSTICO("Rustico");
 	
 	private String nombre;
 	
