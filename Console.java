@@ -5,14 +5,14 @@ public class Console {
 	static StringBuilder response = new StringBuilder("");
 	
 	
-	public static void println(String text) {
+	public static void println(String output) {
 		
-		System.out.println(text);
+		System.out.println(output);
 		
 	}
 	
-	public static void print(String text) {
-		System.out.print(text);
+	public static void print(String output) {
+		System.out.print(output);
 	}
 	
 	//Lee lo introducido en la consola evitando el uso de un try/catch
@@ -32,6 +32,12 @@ public class Console {
 		
 		return response.toString();
 		
+	}
+	
+	public static String readLine(String output) {
+		
+		System.out.println(output);
+		return readLine();
 	}
 	
 }

@@ -31,6 +31,12 @@ public class Inventario {
 		return null;
 	}
 	
+	public Libro getLibro(int indice) {
+		
+		return (Libro)libros.get(indice);
+		
+	}
+	
 	public List buscar(DescripcionLibro descLibroBuscado) {
 		
 		List librosEncontrados = new LinkedList();
@@ -51,6 +57,20 @@ public class Inventario {
 	
 	public List getLibros() {
 		return libros;
+	}
+	
+	public void removeLibro(int indice) {
+		libros.remove(indice);
+	}
+	
+	public void replaceLibro(int indice, Libro nuevoLibro) {
+		libros.set(indice, nuevoLibro);
+	}
+	
+	public int length() {
+		
+		return libros.size();
+		
 	}
 	
 	private void inicializaInventario() {
@@ -203,7 +223,7 @@ public class Inventario {
 			"presencias siniestras de las que se puede escapar.",
 			new DescripcionLibro("La búsqueda soñada de la oculta Kadath",
 								 "H.P. Lovecraft", Editorial.TOMO,
-								 Formato.TAPA_DURA, 2));
+								 Formato.RUSTICO, 2));
 		
 	}
 	
