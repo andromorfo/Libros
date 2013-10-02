@@ -4,6 +4,7 @@ public enum Formato {
 	RUSTICO("Rustico");
 	
 	private String nombre;
+	public static final int size = Formato.values().length;
 	
 	Formato(String  nombre) {
 		this.nombre = nombre;

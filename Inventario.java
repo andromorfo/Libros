@@ -16,6 +16,10 @@ public class Inventario {
 		libros.add(libro);
 	}
 	
+	public void addLibro(Libro libro) {
+		libros.add(libro);
+	}
+	
 	public Libro getLibro(String isbn) {
 		
 		for(Iterator i = libros.iterator(); i.hasNext();) {
@@ -63,7 +67,7 @@ public class Inventario {
 		libros.remove(indice);
 	}
 	
-	public void replaceLibro(int indice, Libro nuevoLibro) {
+	public void setLibro(int indice, Libro nuevoLibro) {
 		libros.set(indice, nuevoLibro);
 	}
 	
@@ -161,8 +165,8 @@ public class Inventario {
 			"detalles tecnológicos, militares, sociales, económicos, y " +
 			"políticos de cómo la civilización estuvo al borde de la " +
 			"extinción en la lucha total contra el muerto viviente.",
-			new DescripcionLibro("GUERRA MUNDIAL Z. UNA HISTORIA ORAL DE LA" +
-								 " GUERRA ZOMBI", "Max Brooks",
+			new DescripcionLibro("Guerra Mundial Z. Una Historia Oral de la " +
+								 "Guerra Zombi", "Max Brooks",
 								 Editorial.ALMUZARA, Formato.RUSTICO, 1));
 		
 		
@@ -181,7 +185,7 @@ public class Inventario {
 			"novelas más importantes de nuestro tiempo.",
 			new DescripcionLibro("Un mundo feliz", "Aldous Huxley",
 								 Editorial.PLAZA_Y_JANES, Formato.TAPA_DURA,
-								 -1));
+								 0));
 						
 		addLibro("970-627-200-1", 256,
 			"En esta novela utópica, Aldous Huxley abre una ventana por la " +
@@ -202,7 +206,7 @@ public class Inventario {
 			"espendida novela, que ha pasado a formar parte del acervo " +
 			"intelectual de la humanidad.",
 			new DescripcionLibro("Un mundo feliz", "Aldous Huxley",
-								 Editorial.EPOCA, Formato.RUSTICO, -1));
+								 Editorial.EPOCA, Formato.RUSTICO, 0));
 		
 		addLibro("970-666-777-6", 192,
 			"Tan importantes como los relatos sobre los \"Mitos de Cthulhu\" " +

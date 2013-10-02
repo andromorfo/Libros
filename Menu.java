@@ -12,20 +12,16 @@ public class Menu {
 	}
 	
 	static {
-		
 		inventario = new Inventario();
-		muestraMenu();
-		
+		menu();	
 	}
 	
-	public static void muestraMenu() {
-		
-		BufferedReader in=new BufferedReader(new InputStreamReader(System.in));
+	public static void menu() {
 		
 		cicloMenu:
 		for(;;) {
 		
-			System.out.println("\nSeleccione una opcion:" +
+			System.out.println("\n>>>>>>>>>>Seleccione-una-opcion<<<<<<<<<<" +
 			"\n\t1) Agregar un Libro" + 
 			"\n\t2) Eliminar un Libro" +
 			"\n\t3) Buscar un Libro" +
@@ -72,634 +68,469 @@ public class Menu {
 			
 	}
 	
+	//Funciones-del-Menú--------------------------------------------------------
+	
 	public static void agregarLibro() {
 		
-		String autor, titulo, isbn, sinopsis;
-		Editorial editorial;
-		Formato formato;
-		int numDePag = 0, edicion = 0;
-		int indice = 0;
+		Libro libroNuevo = new Libro();
+		DescripcionLibro descripcionNueva = libroNuevo.getDescripcion();
 		
-		Console.println("\n-------Agregar Libro Nuevo-------\n");
+		Console.println("\n>>>>>>>>>>Agregar-Libro-Nuevo<<<<<<<<<<\n");
 		
 		//Autor-----
-		do {
-			Console.print("\nNombre del autor: ");
-			autor = Console.readLine();
-		} while(autor.equals(""));
+		descripcionNueva.setAutor(selectAutor());
+		//Titulo-----
+		descripcionNueva.setTitulo(selectTitulo());
+		//Editorial-----
+		descripcionNueva.setEditorial(selectEditorial());
+		//Formato
+		descripcionNueva.setFormato(selectFormato());
+		//ISBN
+		libroNuevo.setIsbn(selectIsbn());
+		//Páginas
+		libroNuevo.setPaginas(selectPaginas());
+		//Edición
+		descripcionNueva.setEdicion(selectEdicion());
+		//Sinopsis
+		libroNuevo.setSinopsis(selectSinopsis());
+		
+		//Verificación de datos
+		System.out.println(">>>>>>>>>>Verifique-los-Datos<<<<<<<<<<");
+		System.out.println(libroNuevo);
+		
+		//Confirmar Operación
+		if(confirmar()) {
+			libroNuevo.setDescripcion(descripcionNueva);
+			inventario.addLibro(libroNuevo);
+			System.out.println("\nEl libro ha sido agregado.");
+		} else {
+			System.out.println("\nEl libro no ha sido agregado.");
+			return;
+		}
+			
+		Console.readLine();		   		
+	
+	}
+	
+	public static void eliminarLibro() {
+		
+		System.out.println(">>>>>>>>>>Eliminar-Libro<<<<<<<<<<\n");
+		
+		//Muestra una lista con todos los libros en el inventario
+		int numLib = selectLibro();
+		
+		//Si no se selecciona nada salimos
+		if(numLib == -1) {
+			Console.readLine("Operacion cancelada");
+		} else {
+			//Pedimos confirmar la operación
+			if(confirmar()) {
+				inventario.removeLibro(numLib);
+				Console.readLine("El libro ha sido eliminado");
+			} else {
+				Console.readLine("Operacion Cancelada");
+			}
+		}
+		
+	}
+	
+	public static void buscarLibro() {
+		
+		System.out.println(">>>>>>>>>>Buscar-Libro<<<<<<<<<<\n");
+		
+		DescripcionLibro descripcionBuscada = new DescripcionLibro();
 		
 		//Titulo-----
-		do {
-			Console.print("\nTitulo del libro: ");
-			titulo = Console.readLine();
-		} while(titulo.equals(""));
-		
+		descripcionBuscada.setTitulo(selectTitulo());
+		//Autor-----
+		descripcionBuscada.setAutor(selectAutor());
 		//Editorial-----
-		cicloEditorial:
-		while(true) {
-			indice = 0;
-			Console.println("\nIntroduza el numero de la editorial correspondiente");
+		descripcionBuscada.setEditorial(selectEditorial());
+		//Formato
+		descripcionBuscada.setFormato(selectFormato());
+		//Edición
+		descripcionBuscada.setEdicion(selectEdicion());
+		
+		List resultados = inventario.buscar(descripcionBuscada);
+		
+		//No se encontraron resultados
+		if(resultados.isEmpty()){
+			System.out.println("No se han encontrado resultados para:\n" +
+								descripcionBuscada);
+			Console.readLine();
+			return;
+		}
+		
+		System.out.println("Se-han-encontrado-los-siguientes resultados" +
+			"-------------------------------------");
+		Console.readLine();
+		for(Iterator i = resultados.iterator(); i.hasNext();) {
 			
+			Libro libro = (Libro) i.next();
+			DescripcionLibro descripcion = libro.getDescripcion();
+			
+			System.out.println(descripcion);
+			System.out.println("--------------------------------------------");
+		}
+		
+		Console.readLine();
+	}
+	
+	public static void modificarLibro() {
+		
+		Libro libroViejo = null;
+		DescripcionLibro descripcionVieja = null;
+		Libro libroNuevo = new Libro();
+		DescripcionLibro descripcionNueva = libroNuevo.getDescripcion();
+		
+		System.out.println(">>>>>>>>>>>>>>>Modificar-Libro<<<<<<<<<<<<<<<");
+		
+		//Si se selecciona algo lo asignamos, si no, salimos
+		int indice = selectLibro();
+		if(indice != -1) {
+			libroViejo = inventario.getLibro(indice);
+			descripcionVieja = libroViejo.getDescripcion();
+		} else {
+			System.out.println("Modificacion cancelada...");
+			Console.readLine();
+			return;
+		}
+		
+		//Mostramos datos viejos y pedimos datos nuevos
+		
+		//Título-----
+		System.out.println("Titulo: " + descripcionVieja.getTitulo());
+		String tituloNuevo = selectTitulo();
+		if(!tituloNuevo.equals("")) {
+			descripcionNueva.setTitulo(tituloNuevo);
+		} else {
+			descripcionNueva.setTitulo(descripcionVieja.getTitulo());
+		}
+		//Autor-----
+		System.out.println("Autor: " + descripcionVieja.getAutor());
+		String autorNuevo = selectAutor();
+		if(!autorNuevo.equals("")) {
+			descripcionNueva.setAutor(autorNuevo);
+		} else {
+			descripcionNueva.setAutor(descripcionVieja.getAutor());
+		}
+		//Editorial-----
+		System.out.println("Editorial: " + descripcionVieja.getEditorial());
+		Editorial editorialNueva = selectEditorial();
+		if(editorialNueva != null) {
+			descripcionNueva.setEditorial(editorialNueva);
+		} else {
+			descripcionNueva.setEditorial(descripcionVieja.getEditorial());
+		}
+		//Formato
+		System.out.println("Formato: " + descripcionVieja.getFormato());
+		Formato FormatoNuevo = selectFormato();
+		if(FormatoNuevo != null) {
+			descripcionNueva.setFormato(FormatoNuevo);
+		} else {
+			descripcionNueva.setFormato(descripcionVieja.getFormato());
+		}
+		//ISBN
+		System.out.println("ISBN: " + libroViejo.getIsbn());
+		String isbnNuevo = selectIsbn();
+		if(!isbnNuevo.equals("")) {
+			libroNuevo.setIsbn(isbnNuevo);
+		} else {
+			libroNuevo.setIsbn(libroViejo.getIsbn());
+		}
+		//Páginas
+		System.out.println("Paginas: " + libroViejo.getPaginas());
+		int paginasNuevas = selectPaginas();
+		if(paginasNuevas != 0) {
+			libroNuevo.setPaginas(paginasNuevas);
+		} else {
+			libroNuevo.setPaginas(libroViejo.getPaginas());
+		}
+		//Edición
+		System.out.println("Edicion: " + descripcionVieja.getEdicion());
+		int edicionNueva = selectEdicion();
+		if(edicionNueva != 0) {
+			descripcionNueva.setEdicion(edicionNueva);
+		} else {
+			descripcionNueva.setEdicion(descripcionVieja.getEdicion());
+		}
+		//Sinopsis
+		System.out.println("Sinopsis: " + libroViejo.getSinopsis());
+		String sinopsisNueva = selectSinopsis();
+		if(!sinopsisNueva.equals("")) {
+			libroNuevo.setSinopsis(sinopsisNueva);
+		} else {
+			libroNuevo.setSinopsis(libroViejo.getSinopsis());
+		}
+
+		System.out.println(">>>Confirme los siquientes datos------");
+		Console.readLine();
+		System.out.println(libroNuevo);
+		
+		//Confirmamos la operación
+		if(confirmar()) {
+			inventario.setLibro(indice, libroNuevo);
+		} else {
+			System.out.println("Operacion cancelada");
+			Console.readLine();
+		}
+		
+	}
+	
+	public static void listarLibros() {
+		
+		List libros = inventario.getLibros();
+		
+		for(int i = 0; i < libros.size(); i++) {
+			Libro libro = (Libro)libros.get(i);
+			DescripcionLibro descripcion = libro.getDescripcion();
+			
+			
+			System.out.println("\n" + i + ")_________________________________" +
+			"______________________________" +
+							   descripcion);
+		}
+		
+		System.out.println(
+			"================================================================");
+	}
+	
+	
+	//Funciones-Auxiliares------------------------------------------------------
+	
+	private static int selectLibro() {
+			
+		listarLibros();
+		
+		while(true) {
+			
+			String entrada = Console.readLine(
+				"Seleccione un libro o deje en blanco para omitir");
+			
+			int numLib = -1;
+			
+			if(entrada.equals("")) {
+				return -1;
+			}
+			
+			try{
+				numLib = Integer.parseInt(entrada);
+			} catch(NumberFormatException nfe) {
+				continue;
+			}
+			
+			if(numLib >= 0 && numLib < inventario.length()) {
+				//Muestra el libro seleccionado
+				Libro libro = inventario.getLibro(numLib);
+				DescripcionLibro descripcion = libro.getDescripcion();
+				System.out.println(">>>>>>>>>>>>>Libro-Seleccionado<<<<<<<<<<<<<");
+				System.out.println(descripcion);
+				
+				System.out.println("-----------------------------------------");
+				
+				return numLib;
+			}
+			
+		}
+	}
+	
+	private static String selectTitulo() {
+		String titulo = "";
+		titulo = Console.readLine("Ingrese el [Titulo]" + 
+									"\no deje en blanco para ignorar.");
+		return titulo;
+	}
+	
+	private static String selectAutor() {
+		String autor = "";
+		autor = Console.readLine("Ingrese el [Autor]" +
+									"\no deje en blanco para ignorar.");
+		return autor;
+	}
+	
+	private static Editorial selectEditorial() {
+		int indice = -1;
+		
+		while(true) {
+			
+			indice = -1;
+			Console.println(
+				"Introduza el numero de la [Editorial] correspondiente" +
+				"\no deje en blanco para ignorar.");
+			
+			//Imprimimos las editoriales
+			int i = 0;
 			for(Editorial e: Editorial.values()){
-			System.out.println("\t" + indice + ".-" + e);
-			indice++;
+				System.out.println("\t" + i + ".-" + e);
+				i++;
 			}
 			
 			String ed = Console.readLine();
 			
+			//Si no se ingresa nada salimos
+			if(ed.equals("")) {
+				return null;
+			}
+			
+			//Checamos que sea número
 			try {
 				indice = Integer.parseInt(ed);
 			} catch(NumberFormatException nfe) {
 				//Ignore this thang, mate
 			}
 			
-			if(indice>=0 && indice < Editorial.values().length) {
-				break cicloEditorial;
+			//Checamos que esté dentro del rango del índice
+			if(indice>=0 && indice < Editorial.size) {
+				return Editorial.values()[indice];
 			}
 			
 		}
-		editorial = Editorial.values()[indice];
 		
-		//Formato
-		cicloFormato:
+	}
+	
+	private static Formato selectFormato() {
+		int indice = -1;
+		
 		while(true) {
-			indice = 0;
-			Console.println("\nIntroduza el numero del formato correspondiente");
 			
-			for(Formato e: Formato.values()){
-			System.out.println("\t" + indice + ".-" + e);
-			indice++;
+			indice = -1;
+			Console.println(
+				"\nIntroduza el numero del [Formato] correspondiente" +
+				"\no deje en blanco para ignorar.");
+			
+			//Imprimimos los Formatos
+			int i = 0;
+			for(Formato f: Formato.values()){
+				System.out.println("\t" + i + ".-" + f);
+				i++;
 			}
 			
 			String fo = Console.readLine();
 			
+			//Si no se ingresa nada salimos
+			if(fo.equals("")) {
+				return null;
+			}
+			
+			//Checamos que sea número
 			try {
 				indice = Integer.parseInt(fo);
 			} catch(NumberFormatException nfe) {
-				//Ignore this thang, mate.
+				//Ignore this thang, mate
 			}
 			
-			if(indice>=0 && indice < Formato.values().length) {
-				break cicloFormato;
+			//Checamos que esté dentro del rango del índice
+			if(indice>=0 && indice < Formato.size) {
+				return Formato.values()[indice];
 			}
 			
 		}
-		formato = Formato.values()[indice];
 		
-		//ISBN
-		cicloIsbn:
-		while(true) {
-			System.out.print("\nISBN: ");
-			
-			isbn = Console.readLine();
-			
-			//Si no está vacío y contiene los 10 o 13 dígitos correspondientes
-			if(!isbn.equals("") ) {
-				
-				if(isbn.replace("-","").length() == 10 || 
-				   isbn.replace("-","").length() == 13 ) {
-				   	break cicloIsbn;
-				}
-				
-			} else {
-				break cicloIsbn;
-			}
-		}
-		
-		//Número de páginas
-		cicloNumPag:
-		while(true)	{
-			
-			System.out.print("\nNumero de paginas: ");
-			numDePag = -1;
-			
-			String numS = Console.readLine();
-			
-			if(!numS.equals("")) {
-				
-				try {
-					numDePag = Integer.parseInt(numS);
-				} catch(NumberFormatException nfe) {
-					numDePag = -1;
-				}
-				
-			} else {
-				numDePag = 0;
-			}
-			
+	}
 	
-			if(numDePag >= 0) {
-				break cicloNumPag;
-			}
-		}
+	private static int selectEdicion() {
 		
-		//Edición
-		cicloEdicion:
+		int edicion = 0;
+		
 		while(true)	{
 			
-			System.out.print("\nEdicion: ");
-			edicion = -1;
+			edicion = 0;
 			
-			String edicionS = Console.readLine();
+			String edicionS = Console.readLine("\nIngrese la [Edicion]" +
+											"\no deje en blanco para ignorar.");
 			
-			if(!edicionS.equals("")) {
+			if(edicionS.equals("")) {
+				return 0;
+			} else {	
 				
 				try {
 					edicion = Integer.parseInt(edicionS);
 				} catch(NumberFormatException nfe) {
-					edicion = -1;
+					//Do nothing
 				}
 				
-			} else {
-				edicion = 0;
-			}
-			
-	
-			if(edicion >= 0) {
-				break cicloEdicion;
-			}
-		}
-		
-		//Sinopsis
-		System.out.println("Sinopsis: " );
-		sinopsis = Console.readLine();
-		
-		//Verificación de datos
-		System.out.print("\n\n----------Verifique-los-datos----------\n" +
-						   "\nAutor: " + autor +
-						   "\nTitulo: " + titulo +
-						   "\nEditorial: " + editorial +
-						   "\nFormato: " + formato +
-						   "\nISBN: " + isbn +
-						   "\nNumero de Paginas: " + numDePag +
-						   "\nEdicion: " + edicion +
-						   "\nSinopsis: ");
-		//Imprime resumen de la sinopsis
-		System.out.print( (sinopsis.length() < 50)? 
-								sinopsis.substring(0, sinopsis.length()) :
-								sinopsis.substring(0, 50) );
-		System.out.print("...");
-		
-		//Agregar?
-		while(true) {
-			System.out.println("\n\nAgregar libro? (S/N)");
-			
-			String resp = Console.readLine();
-			
-			if(resp.equalsIgnoreCase("s")) {
-				
-				inventario.addLibro(isbn, numDePag, sinopsis,
-					new DescripcionLibro(titulo, autor, editorial, formato,
-										 edicion));
-				System.out.println("\nEl libro ha sido agregado.");
-				return;
-				
-			} else if(resp.equalsIgnoreCase("n")) {
-				
-				System.out.println("\nEl libro no ha sido agregado.");
-				return;
-				
-			} 
-			
-			Console.readLine();
-		}				   		
-
-		
-	}
-	
-	public static void eliminarLibro() {
-		System.out.println("Seleccione el numero de libro que desea eliminar");
-		Console.readLine();
-		
-		//Muestra una lista con todos los libros en el inventario
-		listarLibros();
-		
-		cicloEliminar:
-		while(true) {
-			System.out.print("Marque c si desean cancelar"+
-			"\n\nQue libro desea eliminar?: ");
-			
-			String opcion = Console.readLine();
-			int numLib = -1;
-			
-			if(opcion.equalsIgnoreCase("c")) {
-				return;
-			} else {
-				try {
-					numLib = Integer.parseInt(opcion);
-				} catch(NumberFormatException nfe) {
-				}
-				
-				if(numLib != -1) {
-					
-					System.out.print("\nDesea eliminar el libro?:\n" +
-						inventario.getLibro(numLib) +
-						"\n\n(S/N):");
-					
-					if(Console.readLine().equalsIgnoreCase("s")) {
-						inventario.removeLibro(numLib);
-						System.out.println("\nEl libro ha sido eliminado");
-						Console.readLine();
-						return;
-					} else {
-						System.out.println("\nEliminacion cancelada");
-						Console.readLine();
-						return;
-					}
+				if(edicion > 0) {
+					return edicion;
 				}
 				
 			}
+			
 		}
-		
-		
-		
-		
 		
 	}
 	
-	public static void buscarLibro() {
+	private static String selectIsbn() {
 		
-		String  titulo, autor;
-		Editorial editorial = null;
-		Formato formato = null;
-		int edicion = -1, indice = 0;
+		String isbn;
 		
-		//Título
-		titulo = Console.readLine("\nIntroduzca el <titulo> del libro o deje " +
-								  "blanco para ignorar.");
-		//Autor
-		autor = Console.readLine("\nIntroduzca el <autor> del libro o deje " +
-								 "en blanco para ignorar.");
-		//Editorial
-		cicloEditorial:
-		while(true) {
-			indice = 0;
-			Console.println("\nIntroduza el numero de la <editorial> " +
-															"correspondiente");
-			//Imprime las editoriales junto a un índice
-			for(Editorial e: Editorial.values()){
-			System.out.println("\t" + indice + ".-" + e);
-			indice++;
-			}
-			
-			String ed = Console.readLine();
-			if(ed.equals("")){
-				break cicloEditorial;
-			}
-			
-			try {
-				indice = Integer.parseInt(ed);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			if(indice>=0 && indice < Editorial.values().length) {
-				editorial = Editorial.values()[indice];
-				break cicloEditorial;
-			}
-			
-		}
-		
-		//Formato
-		cicloFormato:
-		while(true) {
-			indice = 0;
-			Console.println("\nIntroduza el numero del <formato> " +
-															"correspondiente");
-			
-			for(Formato e: Formato.values()){
-			System.out.println("\t" + indice + ".-" + e);
-			indice++;
-			}
-			
-			String fo = Console.readLine();
-			if(fo.equals("")) {
-				break cicloFormato;
-			}
-			
-			try {
-				indice = Integer.parseInt(fo);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			if(indice>=0 && indice < Formato.values().length) {
-				formato = Formato.values()[indice];
-				break cicloFormato;
-			}
-			
-		}
-		
-		
-		//Edicion
-		cicloEdicion:
-		while(true) {
-			String ed = Console.readLine("Introduzca en <numero> de edicion " +
-										 "o deje en blanco para ingorar.");
-			if(ed.equals("")) {
-				break cicloEdicion;
-			}
-			
-			try {
-				edicion = Integer.parseInt(ed);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			break cicloEdicion;
-		}
-		
-		DescripcionLibro descripcion = new
-			DescripcionLibro(titulo, autor, editorial, formato, edicion);
-		
-		
-		//Muestra los resultados, si es que los hay
-		List resultados = inventario.buscar(descripcion);
-		
-		if(!resultados.isEmpty()) {
-			System.out.println(">>>>>>Se_han_encontrado_los_siguientes_libros" +
-							   "<<<<<<");
-		} else {
-			System.out.println("No se han encontrado libros");
-			Console.readLine();
-		}
-		
-		for(Iterator i = resultados.iterator(); i.hasNext();) {
-			Libro libro = (Libro)i.next();
-			System.out.println(libro);
-		}
-		
-		System.out.println("-----------------");
-		Console.readLine();
-		
-	}
-	
-	public static void modificarLibro() {
-		
-		Libro libroViejo;
-		DescripcionLibro descripcionVieja;
-		String autor, titulo,isbn, sinopsis;
-		Editorial editorial = null;
-		Formato formato = null;
-		int edicion = -1, paginas = -1, indice, indiceL;
-		
-		
-		System.out.println(">>>>>>" + 
-			"Seleccione el numero de libro que desea modificar" +
-			"<<<<<<");
-		Console.readLine();
-		
-		//Muestra una lista con todos los libros en el inventario
-		listarLibros();
-		
-		//Slecciona un libro
-		cicloSelectLibro:
-		while(true) {
-			try {
-				indice = Integer.parseInt(
-						Console.readLine("Numero de Libro:"));
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			if(indice >=0 && indice <= inventario.length()) {
-				libroViejo = (Libro)inventario.getLibro(indice);
-				descripcionVieja = libroViejo.getDescripcion();
-				indiceL = indice;
-				break cicloSelectLibro;
-			} else {
-				continue;
-			}
-			
-		}
-		
-		//Titulo
-		System.out.print("\nTitulo antiguo: " + descripcionVieja.getTitulo());
-		titulo = Console.readLine(
-			"\n>>>Ingrese titulo nuevo (Dejar en blanco para omitir)");
-		if(titulo.equals("")){
-			titulo = descripcionVieja.getTitulo();
-		}
-		
-		//Autor
-		System.out.print("\nAutor antiguo: " + descripcionVieja.getAutor());
-		autor = Console.readLine(
-			"\n>>>Ingrese el autor nuevo (Dejar en blanco para omitir)");
-		if(autor.equals("")) {
-			autor = descripcionVieja.getAutor();
-		}
-		
-		//Editorial
-		cicloEditorial:
-		while(true) {
-			indice = 0;
-			Console.println("\nEditoriales----------------------------");
-			//Imprime las editoriales junto a un índice
-			for(Editorial e: Editorial.values()){
-			System.out.println("\t" + indice + ".-" + e);
-			indice++;
-			}
-			
-			String ed = Console.readLine("Introduzca el numero " +
-				"de la [Editorial] o deje en blanco para omitir");
-			
-			if(ed.equals("")){
-				break cicloEditorial;
-			}
-			
-			try {
-				indice = Integer.parseInt(ed);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			if(indice>=0 && indice < Editorial.values().length) {
-				editorial = Editorial.values()[indice];
-				break cicloEditorial;
-			}
-			
-		}
-		if(editorial == null) {
-			editorial = descripcionVieja.getEditorial();
-		}
-		
-		//Formato
-		cicloFormato:
 		while(true) {
 			
-			//Imprime los Formatos junto a un índice
-			indice = 0;
-			Console.println("\nFormatos----------------------------");
-			for(Formato f: Formato.values()){
-			System.out.println("\t" + indice + ".-" + f);
-			indice++;
-			}
+			isbn = Console.readLine("\nIngresa el [ISBN]" +
+									"\no deje en blanco para ignorar.");
 			
-			String fo = Console.readLine("Introduzca el numero " +
-				"del [Formato] o deje en blanco para omitir");
-			
-			//Si está vacío salimos
-			if(fo.equals("")){
-				break cicloFormato;
-			}
-			
-			//Si causa error no es un número válido
-			try {
-				indice = Integer.parseInt(fo);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			//Si el número está entre el índice asignamos su objeto
-			if(indice>=0 && indice < Formato.values().length) {
-				formato = Formato.values()[indice];
-				break cicloFormato;
-			}
-			
-		}
-		//Si no se selecciono nada asignamos el valor anterior
-		if(formato == null) {
-			formato = descripcionVieja.getFormato();
-		}
-		
-		
-		//Edicion
-		cicloEdicion:
-		while(true) {
-			String ed = Console.readLine("Introduzca en <numero> de edicion " +
-										 "o deje en blanco para ingorar.");
-			if(ed.equals("")) {
-				break cicloEdicion;
-			}
-			
-			try {
-				edicion = Integer.parseInt(ed);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			break cicloEdicion;
-		}
-		
-		if(edicion == -1) {
-			edicion = descripcionVieja.getEdicion();
-		}
-		
-		
-		//ISBN
-		cicloIsbn:
-		while(true) {
-			
-			isbn = Console.readLine("Introduzca el <ISBN> o deje en blanco " +
-									"para ignorar.");
-			
-			//Si no está vacío y contiene los 10 o 13 dígitos correspondientes
+			//Si no está vacío y contiene 10 o 13 carácteres
 			if(!isbn.equals("") ) {
 				
 				if(isbn.replace("-","").length() == 10 || 
 				   isbn.replace("-","").length() == 13 ) {
-				   	break cicloIsbn;
+				   	return isbn;
 				}
 				
 			} else {
-				break cicloIsbn;
+				return "";
 			}
 		}
-		if(isbn.equals("")) {
-			isbn = libroViejo.getIsbn();
-		}
+	}
+	
+	private static int selectPaginas() {
 		
-		//Núm Páginas
-		cicloPaginas:
+		int paginas = 0;
+		
+		while(true)	{
+			
+			paginas = 0;
+			
+			String numS = Console.readLine("\nIngrese el numero de [paginas]" +
+											"\no deje en blanco para ignorar.");
+			
+			if(!numS.equals("")) {
+				
+				try {
+					paginas = Integer.parseInt(numS);
+				} catch(NumberFormatException nfe) {
+					//Do nothing
+				}
+				
+			} else {
+				return 0;
+			}
+			
+			if(paginas >= 0) {
+				 return paginas;
+			}
+		}
+	}
+	
+	private static String selectSinopsis() {
+		return Console.readLine("Ingrese la [Sinopsis]" +
+									"\no deje en blanco para ignorar.");
+	}
+	
+	private static boolean confirmar() {
+			
 		while(true) {
-			String pag = Console.readLine("Introduzca en numero de <Paginas> " +
-										 "o deje en blanco para ingorar.");
-			if(pag.equals("")) {
-				break cicloPaginas;
-			}
 			
-			try {
-				paginas = Integer.parseInt(pag);
-			} catch(NumberFormatException nfe) {
-				continue;
-			}
-			
-			break cicloPaginas;
-		}
-		
-		if(paginas == -1) {
-			paginas = libroViejo.getPaginas();
-		}
-		
-		//Sinopsis
-		System.out.println(">>>Sinopsis vieja<<<\n" + libroViejo.getSinopsis());
-		sinopsis = Console.readLine("\nIntroduzca la nueva <sinopsis>, o " +
-									"deje en blanco para omitir.");
-		if(sinopsis.equals("")) {
-			sinopsis = libroViejo.getSinopsis();
-		}
-		
-		//Mostrar los datos
-		System.out.println("Revise los datos-----------" +
-							"\nTitulo: " + titulo +
-							"\nAutor: " + autor +
-							"\nEditorial: " + editorial +
-							"\nFormato: " + formato +
-							"\nEdicion: " + edicion +
-							"\nIsbn: " + isbn +
-							"\nNum de Paginas: " + paginas +
-							"\nSinopsis: ");
-		//Imprime resumen de la sinopsis
-		System.out.print( (sinopsis.length() < 50)? 
-								sinopsis.substring(0, sinopsis.length()) :
-								sinopsis.substring(0, 50) );
-		System.out.print("...");
-		
-		
-		//Agregar?
-		while(true) {
-			System.out.println("\n\nModificar Libro? (S/N)");
-			
-			String resp = Console.readLine();
+			String resp = Console.readLine("\nConfirmar operacion? (S/N)");
 			
 			if(resp.equalsIgnoreCase("s")) {
-				
-				Libro libroNuevo = new Libro(isbn, paginas, sinopsis,
-					new DescripcionLibro(titulo, autor, editorial, formato,
-										 edicion));
-				
-				inventario.replaceLibro(indiceL, libroNuevo);
-				
-				System.out.println("\nEl libro ha sido modificado.");
-				return;
+										 
+				return true;
 				
 			} else if(resp.equalsIgnoreCase("n")) {
 				
-				System.out.println("\nEl libro no ha sido modificado.");
-				return;
-				
+				return false;
 			} 
 			
-			
-		}
-		
-		
+		}			
 	}
-	
-	public static void listarLibros() {
-		System.out.println("\nLibros Dentro del Inventario----------");
-		
-		List libros = inventario.getLibros();
-		
-		for(int i = 0; i < libros.size(); i++) {
-			Libro libro = (Libro)libros.get(i);
-			
-			System.out.println(i + ")_____________" +
-							   libro + "\n");
-			
-		}
-		
-		System.out.println("------------------------");
-	}
-	
 }

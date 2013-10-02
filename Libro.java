@@ -5,6 +5,10 @@ public class Libro {
 	private String sinopsis;
 	private DescripcionLibro descripcion;
 	
+	public Libro() {
+		descripcion = new DescripcionLibro();
+	}
+	
 	public Libro(String isbn, int paginas, String sinopsis,
 				 DescripcionLibro descripcion) {
 		
@@ -18,24 +22,41 @@ public class Libro {
 		return isbn;
 	}
 	
+	public void setIsbn(String isbn) {
+		this.isbn = isbn;
+	}
+	
 	public int getPaginas() {
 		return paginas;
+	}
+	
+	public void setPaginas(int paginas) {
+		this.paginas = paginas;
 	}
 	
 	public String getSinopsis() {
 		return sinopsis;
 	}
 	
+	public void setSinopsis(String sinopsis) {
+		this.sinopsis = sinopsis;
+	}
+	
 	public DescripcionLibro getDescripcion() {
 		return descripcion;
+	}
+	
+	public void setDescripcion(DescripcionLibro descripcion) {
+		this.descripcion = descripcion;
 	}
 	
 	@Override
 	public String toString() {
 		
 		return getDescripcion() +
-			   "\nPáginas: " + getPaginas() +
-			   "\nISBN: " + getIsbn();
+			   "\nPaginas: " + getPaginas() +
+			   "\nISBN: " + getIsbn() + 
+			   "\nSinopsis: " + getSinopsis();
 		
 	}
 	

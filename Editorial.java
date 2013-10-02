@@ -9,6 +9,7 @@ public enum Editorial {
 	EPOCA("Editorial Época, S.A. de C.V.");
 	
 	private String nombre;
+	public static final int size = Editorial.values().length;
 	
 	Editorial(String nombre) {
 		this.nombre = nombre;
